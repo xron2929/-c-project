@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include<stdlib.h>
+int main(void) {
+	// your code goes here
+	int *arr=(int *)malloc(sizeof(int)*4);
+	*(arr+0)=1;
+	*(arr+1)=7;
+	*(arr+2)=3;
+	*(arr+3)=4;
+	int *brr=(int *)malloc(sizeof(int)*4);
+	*(brr+0)=32;
+	*(brr+1)=35;
+	*(brr+2)=31;
+	*(brr+3)=39;
+	int **arr2=(int **)malloc(sizeof(sizeof(int)*4)*4);
+	*arr2=arr;
+	*(arr2+1)=brr;
+	printf("%d\n",*(*(arr2)+1));
+	printf("%d",*(*(arr2+1)));
+	
+	return 0;
+}
+
+// 이차원 배열을 int (*arr)[4]; 이렇게 짠다는 게 너무 추상적으로 보여
+// 직접 포인터로 머리 식힐겸 가볍게 짰다
