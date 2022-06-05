@@ -1,0 +1,305 @@
+#include <stdio.h>
+#include <stdlib.h>
+using namespace std;
+struct node {
+	int data;
+	struct node* front=NULL;
+	struct node* rear=NULL;
+	struct node* next=NULL;
+	struct node* prev=NULL;
+};
+struct node* createNode(int data,int* linkedListSize) {
+	struct node* newNode = (node *)malloc(sizeof(struct node));
+	if (newNode == NULL) return NULL;
+	newNode->data = data;
+	newNode->front = newNode;
+	newNode->rear = newNode;
+	newNode->next = NULL;
+	(* linkedListSize)++;
+	return newNode;
+}
+// 아직 구현안된 코드
+// 일부분만 탐색하거나
+// 초기화하거나
+// 2이전에 삽입하거나
+// 2뒤에 삽입하거나
+// 2이전에 갯수만큼 삭제하거나
+// 2뒤에 갯수만큼 삭제하거나
+// 2 전에 전부 삭제하거나
+// 2뒤에 전부 삭제하거나
+// 사용자가 미리 HEAD->NEXT->NEXT를 가리키게 한경우
+// 노드 자체를 추가하는 경우 이 경우도 이전이 되거나 뒤에 삽입하거나 
+// 또는 일부만 넣거나
+
+// 연결리스트에 따로 환형 만들어서 함수 제작
+
+struct node* insertData(struct node* currentNode, int position, int data,int* linkedListSize) {
+	int mid = (*linkedListSize) / 2;
+	
+	struct node* newNode = (node*)malloc(sizeof(struct node));
+	
+	if (newNode == NULL) return NULL;
+	newNode->data = data;
+	if (position == *linkedListSize) {
+		printf("linked list는 0부터 position으로 계산합니다");
+		return NULL;
+	}
+	if (position > *linkedListSize) {
+		printf("out of bounds");
+		return NULL;
+	}
+		
+	
+	
+	if (position < mid) {
+		int nextCount = position;
+		struct node * searchNode= currentNode->front;
+		while (nextCount > 0) {
+			searchNode = searchNode->next;
+			nextCount--;
+		}
+	
+		newNode->next = searchNode;
+		newNode->prev = searchNode->prev;
+		newNode->front = searchNode->front;
+		newNode->rear = searchNode->rear;
+
+		if (searchNode->prev) {
+			searchNode->prev->next = newNode;
+		}
+		searchNode->prev = newNode;
+		
+	}
+	else {
+		
+		(*linkedListSize)--;
+		
+		int prevCount = (* linkedListSize) - position;
+		struct node* searchNode = currentNode->rear;
+		
+		while (prevCount) {
+			searchNode = searchNode->prev;
+			prevCount--;
+		}
+			newNode->prev = searchNode->prev;
+			newNode->next = searchNode;
+			newNode->front = searchNode->front;
+			newNode->rear = searchNode->rear;
+
+		
+			searchNode->prev->next = newNode;
+			searchNode->prev = newNode;
+			(*linkedListSize)++;
+
+
+		// 0~9부터 6까지 탐색
+	}
+	if (position == 0) {
+		//node 탐색 후 모든 front를 해당 node로 만들기
+		(*linkedListSize)++;
+		newNode->front = newNode;
+		struct node* searchNode = newNode->front;
+		
+		while (true) {
+			searchNode->front = newNode;
+			if (currentNode == NULL) break;
+			searchNode = currentNode;
+			currentNode = currentNode->next;
+
+		}
+		return searchNode->front;
+	}
+	if (position == (* linkedListSize)-1) {
+		(*linkedListSize)++;
+		//node 탐색 후 모든 rear을 해당 node로 만들기
+		struct node* searchNode = currentNode->front;
+		newNode->rear = newNode->next;
+		while (true) {
+
+			searchNode->rear = newNode->next;
+			if (currentNode == NULL) break;
+			searchNode = currentNode;
+			currentNode = currentNode->next;
+
+		}
+		return searchNode->prev;
+	}
+	
+	return newNode;
+
+}
+
+
+struct node* replaceData(struct node* currentNode, int position, int data, int* linkedListSize) {
+	int mid = (*linkedListSize) / 2;
+
+	if (position == *linkedListSize) {
+		printf("linked list는 0부터 position으로 계산합니다");
+		return NULL;
+	}
+	if (position > *linkedListSize) {
+		printf("out of bounds");
+		return NULL;
+	}
+
+
+
+	if (position < mid) {
+		int nextCount = position;
+		struct node* searchNode = currentNode->front;
+		while (nextCount > 0) {
+			searchNode = searchNode->next;
+			nextCount--;
+		}
+
+		searchNode->data = data;
+	}
+	else {
+
+		(*linkedListSize)--;
+
+		int prevCount = (*linkedListSize) - position;
+		struct node* searchNode = currentNode->rear;
+
+		while (prevCount) {
+			searchNode = searchNode->prev;
+			prevCount--;
+		}
+		searchNode->data = data;
+
+
+		// 0~9부터 6까지 탐색
+	}
+}
+
+
+
+void freeFrontNode(struct node* frontNode) {
+	if (frontNode == NULL) return;
+	
+	struct node* nextNode = frontNode->next;
+	while (true) {
+		printf("free frontNode %d\n", frontNode->data);
+		free(frontNode);
+		if (nextNode == NULL) return;
+
+		frontNode = nextNode;
+		nextNode = nextNode->next;
+
+	}
+	return;
+}
+void freeRearNode(struct node* frontNode) {
+	if (frontNode == NULL) return;
+
+	struct node* nextNode = frontNode->prev;
+	while (true) {
+		printf("free rearNode %d\n", frontNode->data);
+		free(frontNode);
+		if (nextNode == NULL) return;
+
+		frontNode = nextNode;
+		nextNode = nextNode->prev;
+
+	}
+	printf("\n");
+	return;
+}
+struct node* frontInsertNode(struct node* frontNode,int data,int* linkedListSize) {
+	struct node* newNode = (node *)malloc(sizeof(struct node));
+	if (newNode == NULL) return NULL;
+	(*linkedListSize)++;
+	newNode->next = frontNode;
+	newNode->prev = NULL;
+	newNode->data = data;
+	newNode->rear = frontNode->rear;
+	frontNode->prev = newNode;
+
+	
+	struct node* searchNode = newNode;
+
+	while (true) {
+		searchNode->front = newNode;
+		if (frontNode == NULL) break;
+		searchNode = frontNode;
+		frontNode = frontNode->next;
+
+	}
+	return newNode->front;
+}
+struct node* rearInsertNode(struct node* rearNode, int data, int* linkedListSize) {
+	struct node* newNode = (node*)malloc(sizeof(struct node));
+	if (newNode == NULL) return NULL;
+	(*linkedListSize)++;
+	newNode->data = data;
+	newNode->prev = rearNode;
+	newNode->next = NULL;
+	newNode->front = rearNode->front;
+	rearNode->next = newNode;
+	struct node* searchNode = newNode;
+	while (true) {
+
+		searchNode->rear = newNode;
+		if (rearNode == NULL) break;
+		searchNode = rearNode;
+		rearNode = rearNode->prev;
+
+
+	}
+	return newNode->rear;
+}
+void frontSearch(struct node* frontNode) {
+	struct node* searchNode = frontNode->next;
+	while (true) {
+		printf("front search %d\n", frontNode->data);
+		if (searchNode == NULL) break;
+		frontNode = searchNode;
+		searchNode = searchNode->next;
+
+	}
+	printf("\n");
+	return;
+}
+void rearSearch(struct node* rearNode) {
+	struct node* searchNode = rearNode->prev;
+	while (true) {
+		printf("rear search %d\n", rearNode->data);
+		if (searchNode == NULL) break;
+		rearNode = searchNode;
+		searchNode = searchNode->prev;
+
+	}
+	printf("\n");
+	return;
+}
+
+
+
+int main() {
+	int linkedListSize = 0;
+	struct node * currentNode=createNode(3, &linkedListSize);
+
+	printf("front insert %d\n", currentNode->data);
+	currentNode=frontInsertNode(currentNode->front,6,&linkedListSize);
+	printf("front insert %d\n", currentNode->data);
+	currentNode = frontInsertNode(currentNode->front,3,&linkedListSize);
+	printf("front insert %d\n", currentNode->data);
+	currentNode = frontInsertNode(currentNode->front,5,&linkedListSize);
+	printf("front insert %d\n", currentNode->data);
+	currentNode = frontInsertNode(currentNode->front,4,&linkedListSize);
+	printf("front insert %d\n\n", currentNode->data);
+
+	currentNode = rearInsertNode(currentNode->rear, 34,&linkedListSize);
+	printf("rear %d\n\n", currentNode->data);
+
+	currentNode = insertData(currentNode, linkedListSize-1, 19, &linkedListSize);
+	printf("insert %d\n\n", currentNode->data);
+
+	currentNode = replaceData(currentNode, linkedListSize - 3, 32, &linkedListSize);
+	printf("replace %d\n\n", currentNode->data);
+	rearSearch(currentNode->rear);
+	frontSearch(currentNode->front);
+	// freeFrontNode(currentNode->front);
+	freeRearNode(currentNode->rear);
+	return 0;
+}
